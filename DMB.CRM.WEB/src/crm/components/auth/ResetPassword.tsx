@@ -1,6 +1,7 @@
 import { FormEvent, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import http from "../../services/http.service";
+import BrandMark from "../layout/BrandMark";
 
 export default function ResetPassword() {
   const [params] = useSearchParams();
@@ -27,6 +28,7 @@ export default function ResetPassword() {
   return (
     <div className="auth-page">
       <form className="card" onSubmit={onSubmit}>
+        <BrandMark />
         <h1>Reset password</h1>
         {message ? <p>{message}</p> : null}
         {error ? <p className="error">{error}</p> : null}

@@ -1,6 +1,7 @@
 {
   "rewrites": [
     { "source": "/crm/static/:path*", "destination": "/static/:path*" },
+    { "source": "/crm/dmb-web-solutions-logo.png", "destination": "/dmb-web-solutions-logo.png" },
     { "source": "/crm", "destination": "/index.html" },
     { "source": "/crm/:path*", "destination": "/index.html" },
     { "source": "/(.*)", "destination": "/index.html" }

@@ -1,6 +1,7 @@
 import { FormEvent, useState } from "react";
 import { Link } from "react-router-dom";
 import http from "../../services/http.service";
+import BrandMark from "../layout/BrandMark";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
@@ -13,6 +14,7 @@ export default function ForgotPassword() {
   return (
     <div className="auth-page">
       <form className="card" onSubmit={onSubmit}>
+        <BrandMark />
         <h1>Forgot password</h1>
         {message ? <p>{message}</p> : null}
         <div className="field"><label>Email</label><input value={email} onChange={(e) => setEmail(e.target.value)} required /></div>

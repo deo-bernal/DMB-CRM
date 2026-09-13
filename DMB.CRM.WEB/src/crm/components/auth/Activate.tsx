@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import http from "../../services/http.service";
+import BrandMark from "../layout/BrandMark";
 
 export default function Activate() {
   const [params] = useSearchParams();
@@ -19,6 +20,7 @@ export default function Activate() {
   return (
     <div className="auth-page">
       <div className="card">
+        <BrandMark />
         <h1>Activate account</h1>
         <p>{message}</p>
         <Link to="/login">Sign in</Link>

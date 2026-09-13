@@ -1,6 +1,7 @@
 import { FormEvent, useState } from "react";
 import { Link } from "react-router-dom";
 import http from "../../services/http.service";
+import BrandMark from "../layout/BrandMark";
 
 export default function Register() {
   const [form, setForm] = useState({
@@ -27,7 +28,8 @@ export default function Register() {
   return (
     <div className="auth-page">
       <form className="card" onSubmit={onSubmit}>
-        <h1>Register</h1>
+        <BrandMark />
+        <h1>Create account</h1>
         {message ? <p>{message}</p> : null}
         {error ? <p className="error">{error}</p> : null}
         <div className="field"><label>Email</label><input value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required /></div>

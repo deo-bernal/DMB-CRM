@@ -1,6 +1,7 @@
 import { FormEvent, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../../contexts/JWTAuthContext";
+import BrandMark from "../layout/BrandMark";
 
 export default function Login() {
   const { login } = useAuth();
@@ -23,8 +24,9 @@ export default function Login() {
   return (
     <div className="auth-page">
       <form className="card" onSubmit={onSubmit}>
-        <h1>DMB CRM</h1>
-        <p className="muted">Sign in to your location workspace.</p>
+        <BrandMark />
+        <h1>Sign in</h1>
+        <p className="muted">Your DMB location workspace.</p>
         {error ? <p className="error">{error}</p> : null}
         <div className="field">
           <label>Email</label>

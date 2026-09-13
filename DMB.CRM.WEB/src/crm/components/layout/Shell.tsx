@@ -1,5 +1,6 @@
 import { NavLink, Outlet } from "react-router-dom";
 import { useAuth } from "../../../contexts/JWTAuthContext";
+import BrandMark from "./BrandMark";
 
 export default function Shell() {
   const { locations, locationId, setLocationId, logout } = useAuth();
@@ -7,7 +8,9 @@ export default function Shell() {
   return (
     <div className="shell">
       <aside className="nav">
-        <h2>DMB CRM</h2>
+        <a className="brand-wrap" href="https://www.dmbwebsolutions.com/ai-automation">
+          <BrandMark />
+        </a>
         <div className="location-switch">
           <label className="muted">Location</label>
           <select value={locationId ?? ""} onChange={(e) => setLocationId(e.target.value)}>
@@ -18,12 +21,13 @@ export default function Shell() {
             ))}
           </select>
         </div>
+        <div className="nav-label">Workspace</div>
         <NavLink to="/" end>Dashboard</NavLink>
         <NavLink to="/contacts">Contacts</NavLink>
         <NavLink to="/companies">Companies</NavLink>
         <NavLink to="/tags">Tags</NavLink>
         <NavLink to="/opportunities">Opportunities</NavLink>
-        <button className="secondary" style={{ marginTop: "1rem", width: "100%" }} onClick={() => void logout()}>
+        <button className="secondary" style={{ marginTop: "1.2rem", width: "100%" }} onClick={() => void logout()}>
           Sign out
         </button>
       </aside>
