@@ -23,7 +23,9 @@ export default function Activate() {
         <BrandMark />
         <h1>Activate account</h1>
         <p>{message}</p>
-        <Link to="/login">Sign in</Link>
+        <div className="auth-links">
+          <Link to="/login">Sign in</Link>
+        </div>
       </div>
     </div>
   );

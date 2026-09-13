@@ -151,6 +151,34 @@ public class AuthRepository : IAuthRepository
             .ToListAsync(cancellationToken);
     }
 
+    public async Task<AuthTokenLoginResult> IssueJwtForUserAsync(Guid userId, CancellationToken cancellationToken = default)
+    {
+        var user = await _db.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
+        if (user is null)
+        {
+            return new AuthTokenLoginResult { Status = AuthTokenLoginStatus.InvalidCredentials };
+        }
+
+        if (!user.Activated)
+        {
+            return new AuthTokenLoginResult
+            {
+                Status = AuthTokenLoginStatus.AccountBlocked,
+                BlockReason = "Your account is not activated yet."
+            };
+        }
+
+        var locations = await GetUserLocationsAsync(user.Id, cancellationToken);
+        var loginUser = _mapper.Map<LoggedInUserDto>(user);
+        return new AuthTokenLoginResult
+        {
+            Status = AuthTokenLoginStatus.Success,
+            AccessToken = CreateAccessToken(loginUser),
+            Locations = locations,
+            CurrentLocationId = locations.FirstOrDefault()?.LocationId
+        };
+    }
+
     private string CreateAccessToken(LoggedInUserDto user)
     {
         var secret = _configuration["Jwt:Secret"]

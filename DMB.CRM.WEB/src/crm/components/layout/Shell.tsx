@@ -1,9 +1,21 @@
+import { useState } from "react";
 import { NavLink, Outlet } from "react-router-dom";
 import { useAuth } from "../../../contexts/JWTAuthContext";
 import BrandMark from "./BrandMark";
 
 export default function Shell() {
   const { locations, locationId, setLocationId, logout } = useAuth();
+  const [signingOut, setSigningOut] = useState(false);
+
+  const onSignOut = async () => {
+    if (signingOut) return;
+    setSigningOut(true);
+    try {
+      await logout();
+    } catch {
+      setSigningOut(false);
+    }
+  };
 
   return (
     <div className="shell">
@@ -27,8 +39,14 @@ export default function Shell() {
         <NavLink to="/companies">Companies</NavLink>
         <NavLink to="/tags">Tags</NavLink>
         <NavLink to="/opportunities">Opportunities</NavLink>
-        <button className="secondary" style={{ marginTop: "1.2rem", width: "100%" }} onClick={() => void logout()}>
-          Sign out
+        <button
+          className="secondary"
+          style={{ marginTop: "1.2rem", width: "100%" }}
+          onClick={() => void onSignOut()}
+          disabled={signingOut}
+          aria-busy={signingOut}
+        >
+          {signingOut ? <><span className="btn-spinner" aria-hidden /> Signing out…</> : "Sign out"}
         </button>
       </aside>
       <main className="main">

@@ -122,6 +122,8 @@ builder.Services.AddScoped<IOpportunityService, OpportunityService>();
 builder.Services.AddScoped<EmailService>();
 builder.Services.AddScoped<IActivationEmailSender>(sp => sp.GetRequiredService<EmailService>());
 builder.Services.AddScoped<IPasswordResetEmailSender>(sp => sp.GetRequiredService<EmailService>());
+builder.Services.AddScoped<IExternalLoginEmailSender>(sp => sp.GetRequiredService<EmailService>());
+builder.Services.AddHttpClient<IExternalAuthService, ExternalAuthService>();
 builder.Services.AddScoped<LocationContextFilter>();
 #endregion
 

@@ -19,7 +19,9 @@ export default function ForgotPassword() {
         {message ? <p>{message}</p> : null}
         <div className="field"><label>Email</label><input value={email} onChange={(e) => setEmail(e.target.value)} required /></div>
         <button type="submit">Send reset link</button>
-        <p><Link to="/login">Back to sign in</Link></p>
+        <div className="auth-links">
+          <Link to="/login">Back to sign in</Link>
+        </div>
       </form>
     </div>
   );

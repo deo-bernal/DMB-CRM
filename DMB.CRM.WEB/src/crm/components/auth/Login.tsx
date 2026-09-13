@@ -1,23 +1,29 @@
 import { FormEvent, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../../../contexts/JWTAuthContext";
 import BrandMark from "../layout/BrandMark";
+import PasswordField from "./PasswordField";
+import SocialAuthButtons from "./SocialAuthButtons";
 
 export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
+  const [params] = useSearchParams();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [error, setError] = useState(params.get("ssoError")?.trim() ?? "");
+  const [busy, setBusy] = useState(false);
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError("");
+    setBusy(true);
     try {
       await login(username, password);
       navigate("/", { replace: true });
     } catch (err: any) {
       setError(err?.response?.data?.message || "Invalid credentials.");
+      setBusy(false);
     }
   };
 
@@ -27,19 +33,20 @@ export default function Login() {
         <BrandMark />
         <h1>Sign in</h1>
         <p className="muted">Your DMB location workspace.</p>
+        <SocialAuthButtons />
         {error ? <p className="error">{error}</p> : null}
         <div className="field">
           <label>Email</label>
-          <input value={username} onChange={(e) => setUsername(e.target.value)} required />
+          <input value={username} onChange={(e) => setUsername(e.target.value)} required disabled={busy} />
         </div>
-        <div className="field">
-          <label>Password</label>
-          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+        <PasswordField label="Password" value={password} onChange={setPassword} disabled={busy} />
+        <button type="submit" disabled={busy} aria-busy={busy}>
+          {busy ? <><span className="btn-spinner" aria-hidden /> Signing in…</> : "Sign in"}
+        </button>
+        <div className="auth-links">
+          <Link to="/register">Create account</Link>
+          <Link to="/forgot-password">Forgot password?</Link>
         </div>
-        <button type="submit">Sign in</button>
-        <p>
-          <Link to="/register">Create account</Link> · <Link to="/forgot-password">Forgot password</Link>
-        </p>
       </form>
     </div>
   );

@@ -11,4 +11,5 @@ public interface IAuthRepository
     (string PasswordHash, string PasswordSalt) CreatePasswordHash(string password);
     bool VerifyPassword(string password, string passwordSalt, string passwordHash);
     Task<IReadOnlyList<LocationMembershipDto>> GetUserLocationsAsync(Guid userId, CancellationToken cancellationToken = default);
+    Task<AuthTokenLoginResult> IssueJwtForUserAsync(Guid userId, CancellationToken cancellationToken = default);
 }

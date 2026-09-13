@@ -2,6 +2,7 @@ import { FormEvent, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import http from "../../services/http.service";
 import BrandMark from "../layout/BrandMark";
+import PasswordField from "./PasswordField";
 
 export default function ResetPassword() {
   const [params] = useSearchParams();
@@ -32,10 +33,12 @@ export default function ResetPassword() {
         <h1>Reset password</h1>
         {message ? <p>{message}</p> : null}
         {error ? <p className="error">{error}</p> : null}
-        <div className="field"><label>New password</label><input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required /></div>
-        <div className="field"><label>Confirm</label><input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required /></div>
+        <PasswordField label="New password" value={newPassword} onChange={setNewPassword} autoComplete="new-password" />
+        <PasswordField label="Confirm" value={confirmPassword} onChange={setConfirmPassword} autoComplete="new-password" />
         <button type="submit">Save password</button>
-        <p><Link to="/login">Back to sign in</Link></p>
+        <div className="auth-links">
+          <Link to="/login">Back to sign in</Link>
+        </div>
       </form>
     </div>
   );

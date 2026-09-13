@@ -19,6 +19,7 @@ type AuthContextValue = {
   currentRole: string;
   setLocationId: (id: string) => void;
   login: (username: string, password: string) => Promise<void>;
+  acceptSession: (token: string, locations?: LocationMembership[], currentLocationId?: string) => Promise<void>;
   logout: () => Promise<void>;
 };
 
@@ -54,6 +55,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.setItem("crm_token", res.data.token);
     setToken(res.data.token);
     persistLocations(res.data.locations ?? [], res.data.currentLocationId);
+  }, [persistLocations]);
+
+  const acceptSession = useCallback(async (
+    nextToken: string,
+    locations?: LocationMembership[],
+    currentLocationId?: string
+  ) => {
+    localStorage.setItem("crm_token", nextToken);
+    setToken(nextToken);
+    if (locations && locations.length > 0) {
+      persistLocations(locations, currentLocationId);
+      return;
+    }
+
+    const res = await http.get<LocationMembership[]>("/location/list");
+    persistLocations(res.data ?? [], currentLocationId);
   }, [persistLocations]);
 
   const logout = useCallback(async () => {
@@ -92,9 +109,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       currentRole,
       setLocationId,
       login,
+      acceptSession,
       logout,
     }),
-    [token, locations, locationId, currentRole, setLocationId, login, logout]
+    [token, locations, locationId, currentRole, setLocationId, login, acceptSession, logout]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
