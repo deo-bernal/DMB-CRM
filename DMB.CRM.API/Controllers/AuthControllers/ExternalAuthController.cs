@@ -88,8 +88,8 @@ public class ExternalAuthController : ControllerBase
     private string BuildCallbackUrl(string provider)
     {
         var providerKey = provider.Trim().ToLowerInvariant();
-        // Reuse the marketing-site OAuth callbacks already registered for Google / LinkedIn / Facebook.
-        // api/_externalAuth.js forwards crm.* state to this API.
-        return $"https://www.dmbwebsolutions.com/api/auth/external/{providerKey}/callback";
+        // Same domain as the marketing site, different path so Google / LinkedIn / Facebook
+        // treat this as its own app callback and do not collide with /api/auth/external/...
+        return $"https://www.dmbwebsolutions.com/crm/api/auth/external/{providerKey}/callback";
     }
 }

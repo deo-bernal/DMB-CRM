@@ -35,7 +35,7 @@ function ProviderIcon({ provider }: { provider: (typeof PROVIDERS)[number]["id"]
 
 function startHref(provider: string) {
   if (typeof window !== "undefined" && /(?:^|\.)dmbwebsolutions\.com$/i.test(window.location.hostname)) {
-    return `https://www.dmbwebsolutions.com/api/auth/external/${provider}/start?client=web&app=crm`;
+    return `https://www.dmbwebsolutions.com/crm/api/auth/external/${provider}/start?client=web`;
   }
 
   const apiBase = resolveOAuthApiBaseUrl().replace(/\/$/, "");
