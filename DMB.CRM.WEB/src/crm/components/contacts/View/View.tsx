@@ -12,7 +12,15 @@ export default function ContactView() {
     if (id) http.get<Contact>(`/contact/${id}`).then((res) => setContact(res.data));
   }, [id]);
 
-  if (!contact) return <p className="muted">Loading...</p>;
+  if (!contact) {
+    return (
+      <div>
+        <div className="toolbar">
+          <h1>Contact</h1>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>

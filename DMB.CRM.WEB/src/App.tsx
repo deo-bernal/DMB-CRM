@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import { ProtectedRoute } from "./router/ProtectedRoute";
 import Shell from "./crm/components/layout/Shell";
 import SiteFooter from "./crm/components/layout/SiteFooter";
+import LoadingModal from "./crm/components/layout/LoadingModal";
 import Login from "./crm/components/auth/Login";
 import AuthCallback from "./crm/components/auth/AuthCallback";
 import AuthComplete from "./crm/components/auth/AuthComplete";
@@ -51,6 +52,7 @@ export default function App() {
         </Routes>
       </div>
       <SiteFooter />
+      <LoadingModal />
     </div>
   );
 }

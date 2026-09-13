@@ -7,7 +7,7 @@ import { useAuth } from "../../../../contexts/JWTAuthContext";
 
 export default function ContactList() {
   const dispatch = useDispatch<AppDispatch>();
-  const { items, loading } = useSelector((s: RootState) => s.contacts);
+  const { items } = useSelector((s: RootState) => s.contacts);
   const { locationId } = useAuth();
 
   useEffect(() => {
@@ -20,7 +20,6 @@ export default function ContactList() {
         <h1>Contacts</h1>
         <Link to="/contacts/create"><button>New contact</button></Link>
       </div>
-      {loading ? <p className="muted">Loading...</p> : null}
       <table>
         <thead>
           <tr><th>Name</th><th>Email</th><th>Phone</th><th>Company</th><th>Tags</th></tr>
