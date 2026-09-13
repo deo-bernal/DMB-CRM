@@ -41,6 +41,7 @@ public class AuthTokenLoginResult
     public string? BlockReason { get; set; }
     public IReadOnlyList<LocationMembershipDto> Locations { get; set; } = [];
     public Guid? CurrentLocationId { get; set; }
+    public string? FirstName { get; set; }
 }
 
 public class LogoutWorkflowResult

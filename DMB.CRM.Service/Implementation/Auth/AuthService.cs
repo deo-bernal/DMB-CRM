@@ -29,4 +29,7 @@ public class AuthService : IAuthService
 
     public Task<bool> IsJtiRevokedAsync(string jti, CancellationToken cancellationToken = default)
         => _authRepository.IsJtiRevokedAsync(jti, cancellationToken);
+
+    public Task<LoggedInUserDto?> GetLoggedInUserAsync(Guid userId, CancellationToken cancellationToken = default)
+        => _authRepository.GetLoggedInUserAsync(userId, cancellationToken);
 }

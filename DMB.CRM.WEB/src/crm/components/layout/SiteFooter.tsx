@@ -6,8 +6,6 @@ export default function SiteFooter() {
       © {year} DMB Web Solutions ·{" "}
       <a href="https://www.dmbwebsolutions.com/">dmbwebsolutions.com</a>
       {" · "}
-      <a href="/crm">CRM</a>
-      {" · "}
       <a href="https://www.dmbwebsolutions.com/profiles#lots">Lots in Pampanga</a>
     </footer>
   );

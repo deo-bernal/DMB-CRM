@@ -59,8 +59,15 @@ public class AuthRepository : IAuthRepository
             Status = AuthTokenLoginStatus.Success,
             AccessToken = CreateAccessToken(loginUser),
             Locations = locations,
-            CurrentLocationId = locations.FirstOrDefault()?.LocationId
+            CurrentLocationId = locations.FirstOrDefault()?.LocationId,
+            FirstName = user.FirstName
         };
+    }
+
+    public async Task<LoggedInUserDto?> GetLoggedInUserAsync(Guid userId, CancellationToken cancellationToken = default)
+    {
+        var user = await _db.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
+        return user is null ? null : _mapper.Map<LoggedInUserDto>(user);
     }
 
     public async Task<LogoutWorkflowResult> LogoutAsync(
@@ -175,7 +182,8 @@ public class AuthRepository : IAuthRepository
             Status = AuthTokenLoginStatus.Success,
             AccessToken = CreateAccessToken(loginUser),
             Locations = locations,
-            CurrentLocationId = locations.FirstOrDefault()?.LocationId
+            CurrentLocationId = locations.FirstOrDefault()?.LocationId,
+            FirstName = user.FirstName
         };
     }
 
@@ -192,6 +200,7 @@ public class AuthRepository : IAuthRepository
             new Claim(ClaimTypes.Name, user.Username),
             new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
             new Claim(ClaimTypes.Email, user.Email),
+            new Claim(ClaimTypes.GivenName, user.FirstName ?? string.Empty),
             new Claim("agencyId", user.AgencyId.ToString())
         };
 

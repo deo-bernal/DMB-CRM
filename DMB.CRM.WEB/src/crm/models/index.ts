@@ -8,6 +8,7 @@ export type LoginResponse = {
   token: string;
   locations: LocationMembership[];
   currentLocationId?: string;
+  firstName?: string;
 };
 
 export type Contact = {

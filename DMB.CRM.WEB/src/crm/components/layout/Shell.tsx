@@ -3,8 +3,10 @@ import { NavLink, Outlet } from "react-router-dom";
 import { useAuth } from "../../../contexts/JWTAuthContext";
 import BrandMark from "./BrandMark";
 
+const SITE = "https://www.dmbwebsolutions.com";
+
 export default function Shell() {
-  const { locations, locationId, setLocationId, logout } = useAuth();
+  const { locations, locationId, setLocationId, logout, firstName } = useAuth();
   const [signingOut, setSigningOut] = useState(false);
 
   const onSignOut = async () => {
@@ -20,9 +22,10 @@ export default function Shell() {
   return (
     <div className="shell">
       <aside className="nav">
-        <a className="brand-wrap" href="https://www.dmbwebsolutions.com/ai-automation">
+        <a className="brand-wrap" href={`${SITE}/ai-automation`}>
           <BrandMark />
         </a>
+        {firstName ? <div className="nav-greeting">Hi {firstName}</div> : null}
         <div className="location-switch">
           <label className="muted">Location</label>
           <select value={locationId ?? ""} onChange={(e) => setLocationId(e.target.value)}>
@@ -33,12 +36,18 @@ export default function Shell() {
             ))}
           </select>
         </div>
-        <div className="nav-label">Workspace</div>
-        <NavLink to="/" end>Dashboard</NavLink>
-        <NavLink to="/contacts">Contacts</NavLink>
-        <NavLink to="/companies">Companies</NavLink>
-        <NavLink to="/tags">Tags</NavLink>
-        <NavLink to="/opportunities">Opportunities</NavLink>
+        <div className="nav-stack">
+          <div className="nav-label">Workspace</div>
+          <NavLink to="/" end>Dashboard</NavLink>
+          <NavLink to="/contacts">Contacts</NavLink>
+          <NavLink to="/companies">Companies</NavLink>
+          <NavLink to="/tags">Tags</NavLink>
+          <NavLink to="/opportunities">Opportunities</NavLink>
+
+          <div className="nav-label">Your profile</div>
+          <a href={`${SITE}/accent-sidebar/portfolio`}>Portfolio</a>
+          <a href={SITE}>Website</a>
+        </div>
         <button
           className="secondary"
           style={{ marginTop: "1.2rem", width: "100%" }}
@@ -48,6 +57,9 @@ export default function Shell() {
         >
           {signingOut ? <><span className="btn-spinner" aria-hidden /> Signing out…</> : "Sign out"}
         </button>
+        <a className="nav-also" href={`${SITE}/profiles#lots`}>
+          Also: lots in Pampanga
+        </a>
       </aside>
       <main className="main">
         <Outlet />

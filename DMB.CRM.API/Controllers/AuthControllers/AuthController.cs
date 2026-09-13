@@ -30,10 +30,29 @@ public class AuthController : ControllerBase
             {
                 token = result.AccessToken,
                 locations = result.Locations,
-                currentLocationId = result.CurrentLocationId
+                currentLocationId = result.CurrentLocationId,
+                firstName = result.FirstName
             }),
             _ => Unauthorized()
         };
+    }
+
+    [HttpGet("me")]
+    [Authorize]
+    public async Task<IActionResult> Me(CancellationToken cancellationToken)
+    {
+        if (!Guid.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
+        {
+            return Unauthorized();
+        }
+
+        var user = await _authService.GetLoggedInUserAsync(userId, cancellationToken);
+        if (user is null)
+        {
+            return Unauthorized();
+        }
+
+        return Ok(new { firstName = user.FirstName, lastName = user.LastName, email = user.Email });
     }
 
     [HttpPost("logout")]
