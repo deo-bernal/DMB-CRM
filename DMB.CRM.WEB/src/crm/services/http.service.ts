@@ -7,11 +7,11 @@ const http = axios.create({
 });
 
 http.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem("crm_token");
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
-  const locationId = localStorage.getItem("locationId");
+  const locationId = localStorage.getItem("crm_locationId");
   if (locationId) {
     config.headers["X-Location-Id"] = locationId;
   }
@@ -24,8 +24,8 @@ http.interceptors.response.use(
     const status = error?.response?.status;
     const requestUrl = String(error?.config?.url ?? "");
     const isAuthEndpoint = /\/auth\/(login|logout)/i.test(requestUrl);
-    if (status === 401 && !isAuthEndpoint && localStorage.getItem("token")) {
-      localStorage.removeItem("token");
+    if (status === 401 && !isAuthEndpoint && localStorage.getItem("crm_token")) {
+      localStorage.removeItem("crm_token");
       window.dispatchEvent(new Event("crm:unauthorized"));
     }
     return Promise.reject(error);

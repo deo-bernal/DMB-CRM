@@ -84,7 +84,9 @@ builder.Services.AddCors(options =>
                 }
 
                 return Uri.TryCreate(origin, UriKind.Absolute, out var uri)
-                    && uri.Host.EndsWith(".vercel.app", StringComparison.OrdinalIgnoreCase);
+                    && (uri.Host.EndsWith(".vercel.app", StringComparison.OrdinalIgnoreCase)
+                        || uri.Host.Equals("dmbwebsolutions.com", StringComparison.OrdinalIgnoreCase)
+                        || uri.Host.Equals("www.dmbwebsolutions.com", StringComparison.OrdinalIgnoreCase));
             })
             .AllowAnyHeader()
             .AllowAnyMethod());

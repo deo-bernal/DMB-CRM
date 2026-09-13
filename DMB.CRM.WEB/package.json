@@ -2,6 +2,7 @@
   "name": "dmb-crm-web",
   "version": "0.1.0",
   "private": true,
+  "homepage": "/crm",
   "dependencies": {
     "@reduxjs/toolkit": "^2.11.2",
     "axios": "^1.15.0",

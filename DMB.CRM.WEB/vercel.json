@@ -1,5 +1,8 @@
 {
   "rewrites": [
+    { "source": "/crm/static/:path*", "destination": "/static/:path*" },
+    { "source": "/crm", "destination": "/index.html" },
+    { "source": "/crm/:path*", "destination": "/index.html" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }

@@ -26,47 +26,47 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
-  const [token, setToken] = useState<string | null>(() => localStorage.getItem("token"));
+  const [token, setToken] = useState<string | null>(() => localStorage.getItem("crm_token"));
   const [locations, setLocations] = useState<LocationMembership[]>(() => {
-    const raw = localStorage.getItem("locations");
+    const raw = localStorage.getItem("crm_locations");
     return raw ? (JSON.parse(raw) as LocationMembership[]) : [];
   });
-  const [locationId, setLocationIdState] = useState<string | null>(() => localStorage.getItem("locationId"));
+  const [locationId, setLocationIdState] = useState<string | null>(() => localStorage.getItem("crm_locationId"));
 
   const persistLocations = useCallback((next: LocationMembership[], current?: string) => {
     setLocations(next);
-    localStorage.setItem("locations", JSON.stringify(next));
+    localStorage.setItem("crm_locations", JSON.stringify(next));
     const selected = current && next.some((l) => l.locationId === current)
       ? current
       : next[0]?.locationId ?? null;
     setLocationIdState(selected);
-    if (selected) localStorage.setItem("locationId", selected);
-    else localStorage.removeItem("locationId");
+    if (selected) localStorage.setItem("crm_locationId", selected);
+    else localStorage.removeItem("crm_locationId");
   }, []);
 
   const setLocationId = useCallback((id: string) => {
     setLocationIdState(id);
-    localStorage.setItem("locationId", id);
+    localStorage.setItem("crm_locationId", id);
   }, []);
 
   const login = useCallback(async (username: string, password: string) => {
     const res = await http.post<LoginResponse>("/auth/login", { username, password });
-    localStorage.setItem("token", res.data.token);
+    localStorage.setItem("crm_token", res.data.token);
     setToken(res.data.token);
     persistLocations(res.data.locations ?? [], res.data.currentLocationId);
   }, [persistLocations]);
 
   const logout = useCallback(async () => {
     try {
-      if (localStorage.getItem("token")) {
+      if (localStorage.getItem("crm_token")) {
         await http.post("/auth/logout");
       }
     } catch {
       // still clear local session
     }
-    localStorage.removeItem("token");
-    localStorage.removeItem("locations");
-    localStorage.removeItem("locationId");
+    localStorage.removeItem("crm_token");
+    localStorage.removeItem("crm_locations");
+    localStorage.removeItem("crm_locationId");
     setToken(null);
     setLocations([]);
     setLocationIdState(null);
