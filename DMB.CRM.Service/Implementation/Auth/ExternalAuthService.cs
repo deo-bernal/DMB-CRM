@@ -127,9 +127,14 @@ public class ExternalAuthService : IExternalAuthService
             return ErrorRedirect(returnPath, $"{Title(normalized)} did not return an authorization code.");
         }
 
-        if (!TryGetProviderConfig(normalized, out var clientId, out var clientSecret))
+        if (!TryGetClientId(normalized, out var clientId))
         {
-            return ErrorRedirect(returnPath, $"{Title(normalized)} sign-in is not configured yet.");
+            return ErrorRedirect(returnPath, $"{Title(normalized)} sign-in is missing ClientId on dmb-crm-api.");
+        }
+
+        if (!TryGetProviderConfig(normalized, out _, out var clientSecret))
+        {
+            return ErrorRedirect(returnPath, $"{Title(normalized)} sign-in is missing ClientSecret on dmb-crm-api.");
         }
 
         OAuthProfile profile;
