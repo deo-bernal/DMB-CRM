@@ -88,10 +88,14 @@ public class ExternalAuthController : ControllerBase
     private string BuildCallbackUrl(string provider)
     {
         var providerKey = provider.Trim().ToLowerInvariant();
-        // LinkedIn / Google / Facebook already allow the marketing-site callbacks.
-        // Reuse those exact URIs so CRM SSO does not need a second registered redirect.
-        // The oauth state is prefixed "crm." so /api/auth/external/... routes the
-        // callback to dmb-crm-api instead of the marketing API.
-        return $"https://www.dmbwebsolutions.com/api/auth/external/{providerKey}/callback";
+        // These must match the URIs already registered on the shared OAuth apps
+        // (same values the marketing API sends today). The oauth state is prefixed
+        // "crm." so the marketing callback can hand the code to dmb-crm-api.
+        if (providerKey == "facebook")
+        {
+            return "https://www.dmbwebsolutions.com/api/auth/external/facebook/callback";
+        }
+
+        return $"https://dmbportfolio-api.onrender.com/api/auth/external/{providerKey}/callback";
     }
 }
