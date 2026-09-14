@@ -6,7 +6,7 @@ export default function BrandMark({ compact = false }: { compact?: boolean }) {
       <img src={logoSrc} alt="DMB Web Solutions" />
       <span className="brand-name">
         DMB Web Solutions
-        {compact ? null : <span className="brand-sub">CRM</span>}
+        {compact ? null : <span className="brand-sub">Customer Relationship Management (CRM)</span>}
       </span>
     </span>
   );

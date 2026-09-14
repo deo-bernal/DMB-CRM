@@ -146,8 +146,9 @@ button.danger { background: #b91c1c; }
   display: block;
   font-size: 0.72rem;
   font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  line-height: 1.25;
+  max-width: 14rem;
   opacity: 0.72;
 }
 
