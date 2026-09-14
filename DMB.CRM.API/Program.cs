@@ -182,6 +182,7 @@ app.Use(async (context, next) =>
 });
 
 app.MapControllers();
+app.MapGet("/", () => Results.Ok(new { status = "ok" }));
 app.MapGet("/health", () => Results.Ok(new { status = "ok" }));
 
 app.Run();
