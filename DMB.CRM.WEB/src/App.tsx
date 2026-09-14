@@ -17,6 +17,8 @@ import ContactView from "./crm/components/contacts/View/View";
 import CompanyList from "./crm/components/companies/List/List";
 import TagList from "./crm/components/tags/List/List";
 import OpportunityList from "./crm/components/opportunities/List/List";
+import ManageUsersPage from "./crm/components/admin/ManageUsersPage";
+import AccountPage from "./crm/components/account/AccountPage";
 import { writeRoles } from "./crm/enums/roles";
 
 export default function App() {
@@ -47,6 +49,8 @@ export default function App() {
             <Route path="companies" element={<CompanyList />} />
             <Route path="tags" element={<TagList />} />
             <Route path="opportunities" element={<OpportunityList />} />
+            <Route path="users" element={<ProtectedRoute allowedRoles={[...writeRoles]}><ManageUsersPage /></ProtectedRoute>} />
+            <Route path="account" element={<AccountPage />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

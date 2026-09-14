@@ -17,6 +17,20 @@ public class LocationRepository : ILocationRepository
 
     public async Task<IReadOnlyList<LocationMembershipDto>> ListForUserAsync(Guid userId, CancellationToken cancellationToken = default)
     {
+        var user = await _db.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
+        if (user?.IsSuperAdmin == true)
+        {
+            return await _db.Locations.AsNoTracking()
+                .Where(l => l.AgencyId == user.AgencyId && l.IsActive)
+                .Select(l => new LocationMembershipDto
+                {
+                    LocationId = l.Id,
+                    Name = l.Name,
+                    Role = Model.Roles.Owner
+                })
+                .ToListAsync(cancellationToken);
+        }
+
         return await _db.UserLocations
             .AsNoTracking()
             .Where(ul => ul.UserId == userId && ul.Location.IsActive)

@@ -13,4 +13,8 @@ public interface IAuthRepository
     Task<IReadOnlyList<LocationMembershipDto>> GetUserLocationsAsync(Guid userId, CancellationToken cancellationToken = default);
     Task<AuthTokenLoginResult> IssueJwtForUserAsync(Guid userId, CancellationToken cancellationToken = default);
     Task<LoggedInUserDto?> GetLoggedInUserAsync(Guid userId, CancellationToken cancellationToken = default);
+    Task<(LoggedInUserDto? User, string? Error)> UpdateOwnProfileAsync(Guid userId, UpdateOwnProfileDto dto, CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<AdminUserDto>> ListAgencyUsersAsync(Guid agencyId, Guid locationId, CancellationToken cancellationToken = default);
+    Task<AdminUserDto?> UpdateAgencyUserAsync(Guid agencyId, Guid locationId, Guid actorUserId, bool actorIsSuperAdmin, Guid userId, UpdateAdminUserDto dto, CancellationToken cancellationToken = default);
+    Task<string?> DeleteAgencyUserAsync(Guid agencyId, Guid actorUserId, Guid userId, CancellationToken cancellationToken = default);
 }

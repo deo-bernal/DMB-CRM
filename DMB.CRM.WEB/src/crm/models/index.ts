@@ -9,6 +9,29 @@ export type LoginResponse = {
   locations: LocationMembership[];
   currentLocationId?: string;
   firstName?: string;
+  isSuperAdmin?: boolean;
+};
+
+export type AuthProfile = {
+  userId: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  contactNo?: string;
+  isSuperAdmin: boolean;
+};
+
+export type AdminUser = {
+  userId: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  contactNo?: string;
+  role: string;
+  activated: boolean;
+  isSuperAdmin: boolean;
+  linkedProviders?: string[];
+  passwordSet?: boolean;
 };
 
 export type Contact = {

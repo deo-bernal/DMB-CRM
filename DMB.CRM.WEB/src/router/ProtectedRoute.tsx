@@ -8,11 +8,11 @@ export function ProtectedRoute({
   children: JSX.Element;
   allowedRoles?: string[];
 }) {
-  const { isAuthenticated, currentRole } = useAuth();
+  const { isAuthenticated, currentRole, isSuperAdmin } = useAuth();
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
-  if (allowedRoles && !allowedRoles.includes(currentRole)) {
+  if (allowedRoles && !isSuperAdmin && !allowedRoles.includes(currentRole)) {
     return <div className="card">You do not have access to this page.</div>;
   }
   return children;

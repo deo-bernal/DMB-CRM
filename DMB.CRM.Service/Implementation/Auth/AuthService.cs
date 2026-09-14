@@ -32,4 +32,16 @@ public class AuthService : IAuthService
 
     public Task<LoggedInUserDto?> GetLoggedInUserAsync(Guid userId, CancellationToken cancellationToken = default)
         => _authRepository.GetLoggedInUserAsync(userId, cancellationToken);
+
+    public Task<(LoggedInUserDto? User, string? Error)> UpdateOwnProfileAsync(Guid userId, UpdateOwnProfileDto dto, CancellationToken cancellationToken = default)
+        => _authRepository.UpdateOwnProfileAsync(userId, dto, cancellationToken);
+
+    public Task<IReadOnlyList<AdminUserDto>> ListAgencyUsersAsync(Guid agencyId, Guid locationId, CancellationToken cancellationToken = default)
+        => _authRepository.ListAgencyUsersAsync(agencyId, locationId, cancellationToken);
+
+    public Task<AdminUserDto?> UpdateAgencyUserAsync(Guid agencyId, Guid locationId, Guid actorUserId, bool actorIsSuperAdmin, Guid userId, UpdateAdminUserDto dto, CancellationToken cancellationToken = default)
+        => _authRepository.UpdateAgencyUserAsync(agencyId, locationId, actorUserId, actorIsSuperAdmin, userId, dto, cancellationToken);
+
+    public Task<string?> DeleteAgencyUserAsync(Guid agencyId, Guid actorUserId, Guid userId, CancellationToken cancellationToken = default)
+        => _authRepository.DeleteAgencyUserAsync(agencyId, actorUserId, userId, cancellationToken);
 }

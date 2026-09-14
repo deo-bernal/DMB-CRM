@@ -9,13 +9,15 @@ import {
 } from "react";
 import { useNavigate } from "react-router-dom";
 import http from "../crm/services/http.service";
-import type { LocationMembership, LoginResponse } from "../crm/models";
-import { firstNameFromToken } from "../crm/utils/sessionUser";
+import type { AuthProfile, LocationMembership, LoginResponse } from "../crm/models";
+import { firstNameFromToken, isSuperAdminFromToken, userIdFromToken } from "../crm/utils/sessionUser";
 
 type AuthContextValue = {
   token: string | null;
   isAuthenticated: boolean;
   firstName: string;
+  userId: string;
+  isSuperAdmin: boolean;
   locations: LocationMembership[];
   locationId: string | null;
   currentRole: string;
@@ -23,6 +25,7 @@ type AuthContextValue = {
   login: (username: string, password: string) => Promise<void>;
   acceptSession: (token: string, locations?: LocationMembership[], currentLocationId?: string) => Promise<void>;
   logout: () => Promise<void>;
+  refreshProfile: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -38,22 +41,41 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [firstName, setFirstName] = useState(() =>
     localStorage.getItem("crm_firstName") || firstNameFromToken(localStorage.getItem("crm_token"))
   );
+  const [userId, setUserId] = useState(() =>
+    localStorage.getItem("crm_userId") || userIdFromToken(localStorage.getItem("crm_token"))
+  );
+  const [isSuperAdmin, setIsSuperAdmin] = useState(
+    () => localStorage.getItem("crm_isSuperAdmin") === "true" || isSuperAdminFromToken(localStorage.getItem("crm_token"))
+  );
 
-  const persistFirstName = useCallback((name?: string | null, token?: string | null) => {
-    const next = (name ?? "").trim() || firstNameFromToken(token ?? null);
+  const persistFirstName = useCallback((name?: string | null, nextToken?: string | null) => {
+    const next = (name ?? "").trim() || firstNameFromToken(nextToken ?? null);
     setFirstName(next);
     if (next) localStorage.setItem("crm_firstName", next);
     else localStorage.removeItem("crm_firstName");
   }, []);
 
-  const hydrateProfile = useCallback(async (token?: string | null) => {
-    try {
-      const res = await http.get<{ firstName?: string }>("/auth/me");
-      persistFirstName(res.data.firstName, token);
-    } catch {
-      persistFirstName(null, token ?? localStorage.getItem("crm_token"));
-    }
+  const persistIdentity = useCallback((profile?: Partial<AuthProfile> | null, nextToken?: string | null) => {
+    persistFirstName(profile?.firstName, nextToken);
+    const nextUserId = profile?.userId || userIdFromToken(nextToken ?? null);
+    setUserId(nextUserId);
+    if (nextUserId) localStorage.setItem("crm_userId", nextUserId);
+    else localStorage.removeItem("crm_userId");
+    const nextSuper = typeof profile?.isSuperAdmin === "boolean"
+      ? profile.isSuperAdmin
+      : isSuperAdminFromToken(nextToken ?? null);
+    setIsSuperAdmin(nextSuper);
+    localStorage.setItem("crm_isSuperAdmin", nextSuper ? "true" : "false");
   }, [persistFirstName]);
+
+  const hydrateProfile = useCallback(async (nextToken?: string | null) => {
+    try {
+      const res = await http.get<AuthProfile>("/auth/me");
+      persistIdentity(res.data, nextToken);
+    } catch {
+      persistIdentity(null, nextToken ?? localStorage.getItem("crm_token"));
+    }
+  }, [persistIdentity]);
 
   const persistLocations = useCallback((next: LocationMembership[], current?: string) => {
     setLocations(next);
@@ -76,11 +98,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.setItem("crm_token", res.data.token);
     setToken(res.data.token);
     persistLocations(res.data.locations ?? [], res.data.currentLocationId);
-    persistFirstName(res.data.firstName, res.data.token);
-    if (!res.data.firstName) {
-      void hydrateProfile(res.data.token);
-    }
-  }, [persistLocations, persistFirstName, hydrateProfile]);
+    persistIdentity({ firstName: res.data.firstName, isSuperAdmin: res.data.isSuperAdmin }, res.data.token);
+    void hydrateProfile(res.data.token);
+  }, [persistLocations, persistIdentity, hydrateProfile]);
 
   const acceptSession = useCallback(async (
     nextToken: string,
@@ -89,7 +109,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   ) => {
     localStorage.setItem("crm_token", nextToken);
     setToken(nextToken);
-    persistFirstName(null, nextToken);
+    persistIdentity(null, nextToken);
     if (locations && locations.length > 0) {
       persistLocations(locations, currentLocationId);
       void hydrateProfile(nextToken);
@@ -99,7 +119,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const res = await http.get<LocationMembership[]>("/location/list");
     persistLocations(res.data ?? [], currentLocationId);
     void hydrateProfile(nextToken);
-  }, [persistLocations, persistFirstName, hydrateProfile]);
+  }, [persistLocations, persistIdentity, hydrateProfile]);
 
   const logout = useCallback(async () => {
     try {
@@ -113,8 +133,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem("crm_locations");
     localStorage.removeItem("crm_locationId");
     localStorage.removeItem("crm_firstName");
+    localStorage.removeItem("crm_userId");
+    localStorage.removeItem("crm_isSuperAdmin");
     setToken(null);
     setFirstName("");
+    setUserId("");
+    setIsSuperAdmin(false);
     setLocations([]);
     setLocationIdState(null);
     navigate("/login", { replace: true });
@@ -140,6 +164,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       token,
       isAuthenticated: Boolean(token),
       firstName,
+      userId,
+      isSuperAdmin,
       locations,
       locationId,
       currentRole,
@@ -147,8 +173,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       login,
       acceptSession,
       logout,
+      refreshProfile: () => hydrateProfile(token),
     }),
-    [token, firstName, locations, locationId, currentRole, setLocationId, login, acceptSession, logout]
+    [token, firstName, userId, isSuperAdmin, locations, locationId, currentRole, setLocationId, login, acceptSession, logout, hydrateProfile]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

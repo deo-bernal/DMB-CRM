@@ -6,8 +6,9 @@ import BrandMark from "./BrandMark";
 const SITE = "https://www.dmbwebsolutions.com";
 
 export default function Shell() {
-  const { locations, locationId, setLocationId, logout, firstName } = useAuth();
+  const { locations, locationId, setLocationId, logout, firstName, currentRole, isSuperAdmin } = useAuth();
   const [signingOut, setSigningOut] = useState(false);
+  const canManageUsers = currentRole === "owner" || currentRole === "admin" || isSuperAdmin;
 
   const onSignOut = async () => {
     if (signingOut) return;
@@ -43,8 +44,11 @@ export default function Shell() {
           <NavLink to="/companies">Companies</NavLink>
           <NavLink to="/tags">Tags</NavLink>
           <NavLink to="/opportunities">Opportunities</NavLink>
+          {canManageUsers ? <NavLink to="/users">Manage users</NavLink> : null}
 
           <div className="nav-label">Your profile</div>
+          <NavLink to="/account">Account</NavLink>
+          <a href={`${SITE}/lms`}>LMS</a>
           <a href={`${SITE}/accent-sidebar/portfolio`}>Portfolio</a>
           <a href={SITE}>Website</a>
         </div>
