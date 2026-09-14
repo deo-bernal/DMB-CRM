@@ -86,9 +86,13 @@ public class ExternalAuthController : ControllerBase
     private string BuildCallbackUrl(string provider)
     {
         var providerKey = provider.Trim().ToLowerInvariant();
-        // Shared OAuth apps must list this public www URI. Chrome Safe Browsing flags
-        // *.onrender.com when LinkedIn/Google bounce back with ?code= in the query.
-        // State is prefixed "crm." so the marketing callback can hand the code to CRM.
-        return $"https://www.dmbwebsolutions.com/api/auth/external/{providerKey}/callback";
+        // Facebook rejects *.onrender.com. LinkedIn's return to Render is blocked by Chrome.
+        // Google Cloud still lists the Render URI; www causes redirect_uri_mismatch.
+        if (providerKey is "facebook" or "linkedin")
+        {
+            return $"https://www.dmbwebsolutions.com/api/auth/external/{providerKey}/callback";
+        }
+
+        return $"https://dmbportfolio-api.onrender.com/api/auth/external/{providerKey}/callback";
     }
 }
