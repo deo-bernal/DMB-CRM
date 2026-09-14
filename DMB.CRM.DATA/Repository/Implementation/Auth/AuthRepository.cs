@@ -293,17 +293,11 @@ public class AuthRepository : IAuthRepository
             .ThenBy(u => u.Email)
             .ToListAsync(cancellationToken);
 
-        return users.Select(u => new AdminUserDto
-        {
-            UserId = u.Id,
-            Email = u.Email,
-            FirstName = u.FirstName,
-            LastName = u.LastName,
-            ContactNo = u.ContactNo,
-            Activated = u.Activated,
-            IsSuperAdmin = u.IsSuperAdmin,
-            Role = memberships.TryGetValue(u.Id, out var role) ? role : (u.IsSuperAdmin ? Roles.Owner : Roles.User)
-        }).ToList();
+        var providers = await LinkedProvidersByUserAsync(users.Select(u => u.Id), cancellationToken);
+        return users.Select(u => MapAdminUser(
+            u,
+            memberships.TryGetValue(u.Id, out var role) ? role : (u.IsSuperAdmin ? Roles.Owner : Roles.User),
+            providers)).ToList();
     }
 
     public async Task<AdminUserDto?> UpdateAgencyUserAsync(
@@ -366,17 +360,8 @@ public class AuthRepository : IAuthRepository
         }
 
         await _db.SaveChangesAsync(cancellationToken);
-        return new AdminUserDto
-        {
-            UserId = user.Id,
-            Email = user.Email,
-            FirstName = user.FirstName,
-            LastName = user.LastName,
-            ContactNo = user.ContactNo,
-            Role = role,
-            Activated = user.Activated,
-            IsSuperAdmin = user.IsSuperAdmin
-        };
+        var providers = await LinkedProvidersByUserAsync([user.Id], cancellationToken);
+        return MapAdminUser(user, role, providers);
     }
 
     public async Task<string?> DeleteAgencyUserAsync(Guid agencyId, Guid actorUserId, Guid userId, CancellationToken cancellationToken = default)
@@ -422,4 +407,48 @@ public class AuthRepository : IAuthRepository
             return "This user still has CRM records, so the account was deactivated instead of deleted.";
         }
     }
+
+    private async Task<Dictionary<Guid, List<string>>> LinkedProvidersByUserAsync(
+        IEnumerable<Guid> userIds,
+        CancellationToken cancellationToken)
+    {
+        var ids = userIds.Distinct().ToList();
+        if (ids.Count == 0)
+        {
+            return [];
+        }
+
+        var rows = await _db.ExternalLogins.AsNoTracking()
+            .Where(login => ids.Contains(login.UserId))
+            .Select(login => new { login.UserId, login.Provider })
+            .ToListAsync(cancellationToken);
+
+        return rows
+            .GroupBy(row => row.UserId)
+            .ToDictionary(
+                group => group.Key,
+                group => group
+                    .Select(row => (row.Provider ?? "").Trim().ToLowerInvariant())
+                    .Where(provider => provider.Length > 0)
+                    .Distinct()
+                    .OrderBy(provider => provider)
+                    .ToList());
+    }
+
+    private static AdminUserDto MapAdminUser(
+        CrmUser user,
+        string role,
+        IReadOnlyDictionary<Guid, List<string>> providersByUser) => new()
+    {
+        UserId = user.Id,
+        Email = user.Email,
+        FirstName = user.FirstName,
+        LastName = user.LastName,
+        ContactNo = user.ContactNo,
+        Role = role,
+        Activated = user.Activated,
+        IsSuperAdmin = user.IsSuperAdmin,
+        PasswordSet = true,
+        LinkedProviders = providersByUser.TryGetValue(user.Id, out var providers) ? providers : []
+    };
 }
