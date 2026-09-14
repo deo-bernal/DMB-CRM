@@ -10,12 +10,10 @@ namespace Dmb.Crm.Api.Controllers.AuthControllers;
 public class ExternalAuthController : ControllerBase
 {
     private readonly IExternalAuthService _externalAuthService;
-    private readonly IConfiguration _configuration;
 
-    public ExternalAuthController(IExternalAuthService externalAuthService, IConfiguration configuration)
+    public ExternalAuthController(IExternalAuthService externalAuthService)
     {
         _externalAuthService = externalAuthService;
-        _configuration = configuration;
     }
 
     [HttpGet("{provider}/start")]
@@ -88,14 +86,9 @@ public class ExternalAuthController : ControllerBase
     private string BuildCallbackUrl(string provider)
     {
         var providerKey = provider.Trim().ToLowerInvariant();
-        // These must match the URIs already registered on the shared OAuth apps
-        // (same values the marketing API sends today). The oauth state is prefixed
-        // "crm." so the marketing callback can hand the code to dmb-crm-api.
-        if (providerKey == "facebook")
-        {
-            return "https://www.dmbwebsolutions.com/api/auth/external/facebook/callback";
-        }
-
-        return $"https://dmbportfolio-api.onrender.com/api/auth/external/{providerKey}/callback";
+        // Shared OAuth apps must list this public www URI. Chrome Safe Browsing flags
+        // *.onrender.com when LinkedIn/Google bounce back with ?code= in the query.
+        // State is prefixed "crm." so the marketing callback can hand the code to CRM.
+        return $"https://www.dmbwebsolutions.com/api/auth/external/{providerKey}/callback";
     }
 }
