@@ -85,7 +85,7 @@ public class ExternalAuthService : IExternalAuthService
             _ =>
                 "https://www.facebook.com/v21.0/dialog/oauth"
                 + "?response_type=code"
-                + "&scope=" + Uri.EscapeDataString("email")
+                + "&scope=" + Uri.EscapeDataString("public_profile,email")
                 + "&client_id=" + Uri.EscapeDataString(clientId)
                 + "&redirect_uri=" + Uri.EscapeDataString(callbackUrl)
                 + "&state=" + Uri.EscapeDataString(state)
@@ -145,6 +145,12 @@ public class ExternalAuthService : IExternalAuthService
         catch (Exception ex)
         {
             _logger.LogWarning(ex, "OAuth token exchange failed for {Provider}.", normalized);
+            var detail = (ex.Message ?? "").Trim();
+            if (detail.StartsWith("Facebook:", StringComparison.OrdinalIgnoreCase))
+            {
+                return ErrorRedirect(returnPath, detail["Facebook:".Length..].Trim());
+            }
+
             return ErrorRedirect(returnPath, $"Could not complete {Title(normalized)} sign-in. Try again.");
         }
 
@@ -529,25 +535,59 @@ public class ExternalAuthService : IExternalAuthService
     private async Task<OAuthProfile> ExchangeFacebookAsync(
         string code, string callbackUrl, string clientId, string clientSecret, CancellationToken cancellationToken)
     {
-        var tokenUrl =
-            "https://graph.facebook.com/v21.0/oauth/access_token"
-            + "?client_id=" + Uri.EscapeDataString(clientId)
-            + "&redirect_uri=" + Uri.EscapeDataString(callbackUrl)
-            + "&client_secret=" + Uri.EscapeDataString(clientSecret)
-            + "&code=" + Uri.EscapeDataString(code);
+        var redirectUris = new[]
+        {
+            callbackUrl,
+            "https://www.dmbwebsolutions.com/api/auth/external/facebook/callback",
+            "https://www.dmbwebsolutions.com/crm/api/auth/external/facebook/callback"
+        }.Distinct(StringComparer.Ordinal).ToArray();
 
-        using var tokenResponse = await _httpClient.GetAsync(tokenUrl, cancellationToken);
-        tokenResponse.EnsureSuccessStatusCode();
-        var token = await tokenResponse.Content.ReadFromJsonAsync<OAuthTokenResponse>(cancellationToken: cancellationToken)
-            ?? throw new InvalidOperationException("Facebook token response was empty.");
+        OAuthTokenResponse? token = null;
+        string? lastError = null;
+        foreach (var redirectUri in redirectUris)
+        {
+            using var tokenRequest = new HttpRequestMessage(HttpMethod.Post, "https://graph.facebook.com/v21.0/oauth/access_token")
+            {
+                Content = new FormUrlEncodedContent(new Dictionary<string, string>
+                {
+                    ["client_id"] = clientId,
+                    ["client_secret"] = clientSecret,
+                    ["redirect_uri"] = redirectUri,
+                    ["code"] = code
+                })
+            };
+            using var tokenResponse = await _httpClient.SendAsync(tokenRequest, cancellationToken);
+            var tokenBody = await tokenResponse.Content.ReadAsStringAsync(cancellationToken);
+            if (tokenResponse.IsSuccessStatusCode)
+            {
+                token = JsonSerializer.Deserialize<OAuthTokenResponse>(tokenBody);
+                break;
+            }
+
+            lastError = ParseFacebookError(tokenBody) ?? $"Facebook token exchange failed ({(int)tokenResponse.StatusCode}).";
+            if (!LooksLikeRedirectMismatch(lastError))
+            {
+                throw new InvalidOperationException("Facebook: " + lastError);
+            }
+        }
+
+        if (token is null || string.IsNullOrWhiteSpace(token.AccessToken))
+        {
+            throw new InvalidOperationException("Facebook: " + (lastError ?? "Facebook token response was empty."));
+        }
 
         var profileUrl =
             "https://graph.facebook.com/me"
             + "?fields=id,first_name,last_name,name,email"
             + "&access_token=" + Uri.EscapeDataString(token.AccessToken ?? "");
         using var userResponse = await _httpClient.GetAsync(profileUrl, cancellationToken);
-        userResponse.EnsureSuccessStatusCode();
-        var user = await userResponse.Content.ReadFromJsonAsync<FacebookUserInfo>(cancellationToken: cancellationToken)
+        var profileBody = await userResponse.Content.ReadAsStringAsync(cancellationToken);
+        if (!userResponse.IsSuccessStatusCode)
+        {
+            throw new InvalidOperationException("Facebook: " + (ParseFacebookError(profileBody) ?? "Facebook profile request failed."));
+        }
+
+        var user = JsonSerializer.Deserialize<FacebookUserInfo>(profileBody)
             ?? throw new InvalidOperationException("Facebook profile was empty.");
 
         var (first, last) = SplitName(user.FirstName, user.LastName, user.Name);
@@ -677,6 +717,40 @@ public class ExternalAuthService : IExternalAuthService
         "facebook" => "Facebook",
         _ => provider
     };
+
+    private static bool LooksLikeRedirectMismatch(string message) =>
+        message.Contains("redirect_uri", StringComparison.OrdinalIgnoreCase);
+
+    private static string? ParseFacebookError(string body)
+    {
+        if (string.IsNullOrWhiteSpace(body))
+        {
+            return null;
+        }
+
+        try
+        {
+            using var doc = JsonDocument.Parse(body);
+            if (doc.RootElement.TryGetProperty("error", out var error))
+            {
+                if (error.TryGetProperty("message", out var message))
+                {
+                    var text = message.GetString();
+                    if (!string.IsNullOrWhiteSpace(text))
+                    {
+                        return text.Length > 220 ? text[..220] : text;
+                    }
+                }
+            }
+        }
+        catch (JsonException)
+        {
+            // Fall through to a short raw snippet.
+        }
+
+        var trimmed = body.Trim();
+        return trimmed.Length > 180 ? trimmed[..180] : trimmed;
+    }
 
     private static string DescribeProviderError(string provider, string error, string? errorDescription)
     {
