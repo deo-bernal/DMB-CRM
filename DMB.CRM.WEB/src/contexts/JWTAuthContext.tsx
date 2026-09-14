@@ -8,6 +8,7 @@ import {
   type ReactNode,
 } from "react";
 import { useNavigate } from "react-router-dom";
+import type { AxiosRequestConfig } from "axios";
 import http from "../crm/services/http.service";
 import type { AuthProfile, LocationMembership, LoginResponse } from "../crm/models";
 import { firstNameFromToken, isSuperAdminFromToken, userIdFromToken } from "../crm/utils/sessionUser";
@@ -70,7 +71,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const hydrateProfile = useCallback(async (nextToken?: string | null) => {
     try {
-      const res = await http.get<AuthProfile>("/auth/me", { skipLoading: true });
+      const res = await http.get<AuthProfile>("/auth/me", { skipLoading: true } as AxiosRequestConfig);
       persistIdentity(res.data, nextToken);
     } catch {
       persistIdentity(null, nextToken ?? localStorage.getItem("crm_token"));

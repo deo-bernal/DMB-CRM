@@ -22,7 +22,7 @@ export default function AccountPage() {
 
   useEffect(() => {
     setLoading(true);
-    http.get<AuthProfile>("/auth/me").then((res) => {
+    http.get<AuthProfile>("/auth/me").then((res: { data: AuthProfile }) => {
       setForm((current) => ({
         ...current,
         firstName: res.data.firstName ?? "",
