@@ -17,7 +17,7 @@ import ContactView from "./crm/components/contacts/View/View";
 import CompanyList from "./crm/components/companies/List/List";
 import TagList from "./crm/components/tags/List/List";
 import OpportunityList from "./crm/components/opportunities/List/List";
-import ManageUsersPage from "./crm/components/admin/ManageUsersPage";
+import ManageUsersPage from "./crm/components/users/ManageUsersPage";
 import AccountPage from "./crm/components/account/AccountPage";
 import { writeRoles } from "./crm/enums/roles";
 

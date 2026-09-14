@@ -2,13 +2,14 @@ import { useState } from "react";
 import { NavLink, Outlet } from "react-router-dom";
 import { useAuth } from "../../../contexts/JWTAuthContext";
 import BrandMark from "./BrandMark";
+import { writeRoles } from "../../enums/roles";
 
 const SITE = "https://www.dmbwebsolutions.com";
 
 export default function Shell() {
   const { locations, locationId, setLocationId, logout, firstName, currentRole, isSuperAdmin } = useAuth();
   const [signingOut, setSigningOut] = useState(false);
-  const canManageUsers = currentRole === "owner" || currentRole === "admin" || isSuperAdmin;
+  const canManageUsers = isSuperAdmin || writeRoles.includes(currentRole as (typeof writeRoles)[number]);
 
   const onSignOut = async () => {
     if (signingOut) return;

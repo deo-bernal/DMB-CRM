@@ -12,7 +12,7 @@ export function ProtectedRoute({
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
-  if (allowedRoles && !isSuperAdmin && !allowedRoles.includes(currentRole)) {
+  if (allowedRoles && !allowedRoles.includes(currentRole) && !isSuperAdmin) {
     return <div className="card">You do not have access to this page.</div>;
   }
   return children;

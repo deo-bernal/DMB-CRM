@@ -113,6 +113,12 @@ button.secondary {
 }
 button.secondary:hover { background: #f8fafc; }
 button.danger { background: #b91c1c; }
+button.ghost {
+  background: #fff;
+  color: #334155;
+  border: 1px solid rgba(71, 85, 105, 0.28);
+}
+button.ghost:hover { background: #f8fafc; }
 
 .brand {
   display: flex;
@@ -491,6 +497,19 @@ tr:last-child td { border-bottom: 0; }
   padding: 1rem;
 }
 .dialog-card { width: min(520px, 100%); max-height: 90vh; overflow: auto; }
+.card.dialog-card { width: min(520px, 100%); }
+.dialog-card .user-actions { margin-top: 1rem; }
+.panel {
+  width: 100%;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 1.2rem 1.3rem;
+  box-shadow: var(--shadow);
+}
+.user-list { display: grid; }
+.switch-field { display: flex; align-items: center; gap: 0.55rem; font-weight: 600; }
+.switch-field input { width: auto; }
 
 @media (max-width: 800px) {
   .shell { grid-template-columns: 1fr; }
