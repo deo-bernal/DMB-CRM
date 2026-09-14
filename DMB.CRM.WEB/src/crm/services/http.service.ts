@@ -1,11 +1,17 @@
-import axios from "axios";
+import axios, { type AxiosRequestConfig } from "axios";
 import { crmApiConfig } from "../../config";
 import { beginLoading, endLoading, tracksPageLoading } from "../utils/loadingGate";
+
+type RequestConfig = AxiosRequestConfig & { skipLoading?: boolean };
 
 const http = axios.create({
   baseURL: crmApiConfig.crm_api_url,
   headers: { "Content-type": "application/json" },
 });
+
+function tracked(config?: RequestConfig) {
+  return tracksPageLoading(config?.url, config?.skipLoading);
+}
 
 http.interceptors.request.use((config) => {
   const token = localStorage.getItem("crm_token");
@@ -16,7 +22,7 @@ http.interceptors.request.use((config) => {
   if (locationId) {
     config.headers["X-Location-Id"] = locationId;
   }
-  if (tracksPageLoading(config.url)) {
+  if (tracked(config)) {
     beginLoading();
   }
   return config;
@@ -24,14 +30,14 @@ http.interceptors.request.use((config) => {
 
 http.interceptors.response.use(
   (response) => {
-    if (tracksPageLoading(response.config.url)) {
+    if (tracked(response.config)) {
       endLoading();
     }
     return response;
   },
   (error) => {
     const requestUrl = String(error?.config?.url ?? "");
-    if (tracksPageLoading(requestUrl)) {
+    if (tracked(error?.config)) {
       endLoading();
     }
     const status = error?.response?.status;

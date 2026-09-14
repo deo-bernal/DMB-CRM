@@ -469,6 +469,15 @@ tr:last-child td { border-bottom: 0; }
   box-shadow: var(--shadow);
 }
 .form-grid { display: grid; gap: 0.75rem; max-width: 560px; }
+.page-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  min-height: 10rem;
+  font-weight: 600;
+}
 .row-actions { display: flex; gap: 0.4rem; }
 .location-switch { margin-bottom: 1.1rem; }
 .location-switch label { color: rgba(203, 213, 225, 0.72); }

@@ -12,7 +12,7 @@ export default function LoadingModal() {
       setVisible(false);
       return;
     }
-    const timer = window.setTimeout(() => setVisible(true), 120);
+    const timer = window.setTimeout(() => setVisible(true), 80);
     return () => window.clearTimeout(timer);
   }, [pending]);
 

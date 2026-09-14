@@ -70,7 +70,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const hydrateProfile = useCallback(async (nextToken?: string | null) => {
     try {
-      const res = await http.get<AuthProfile>("/auth/me");
+      const res = await http.get<AuthProfile>("/auth/me", { skipLoading: true });
       persistIdentity(res.data, nextToken);
     } catch {
       persistIdentity(null, nextToken ?? localStorage.getItem("crm_token"));
