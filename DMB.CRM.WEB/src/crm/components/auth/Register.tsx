@@ -1,7 +1,7 @@
 import { FormEvent, useState } from "react";
 import { Link } from "react-router-dom";
 import http from "../../services/http.service";
-import BrandMark from "../layout/BrandMark";
+import AuthLayout from "./AuthLayout";
 import PasswordField from "./PasswordField";
 import SocialAuthButtons from "./SocialAuthButtons";
 
@@ -28,9 +28,8 @@ export default function Register() {
   };
 
   return (
-    <div className="auth-page">
+    <AuthLayout>
       <form className="card" onSubmit={onSubmit}>
-        <BrandMark />
         <h1>Create account</h1>
         <SocialAuthButtons />
         {message ? <p>{message}</p> : null}
@@ -50,6 +49,6 @@ export default function Register() {
           <Link to="/login">Back to sign in</Link>
         </div>
       </form>
-    </div>
+    </AuthLayout>
   );
 }

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../../../contexts/JWTAuthContext";
-import BrandMark from "../layout/BrandMark";
+import AuthLayout from "./AuthLayout";
 
 export default function AuthCallback() {
   const { acceptSession } = useAuth();
@@ -37,9 +37,8 @@ export default function AuthCallback() {
   }, [token, acceptSession, navigate, redirect]);
 
   return (
-    <div className="auth-page">
+    <AuthLayout>
       <div className="card">
-        <BrandMark />
         <h1>Signing you in</h1>
         <p className="muted">Finishing social sign-in.</p>
         {error ? (
@@ -53,6 +52,6 @@ export default function AuthCallback() {
           <p className="muted">Please wait…</p>
         )}
       </div>
-    </div>
+    </AuthLayout>
   );
 }

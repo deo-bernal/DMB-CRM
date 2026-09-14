@@ -1,7 +1,7 @@
 import { FormEvent, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../../../contexts/JWTAuthContext";
-import BrandMark from "../layout/BrandMark";
+import AuthLayout from "./AuthLayout";
 import PasswordField from "./PasswordField";
 import SocialAuthButtons from "./SocialAuthButtons";
 
@@ -28,9 +28,8 @@ export default function Login() {
   };
 
   return (
-    <div className="auth-page">
+    <AuthLayout>
       <form className="card" onSubmit={onSubmit}>
-        <BrandMark />
         <h1>Sign in</h1>
         <p className="muted">Your DMB location workspace.</p>
         <SocialAuthButtons />
@@ -48,6 +47,6 @@ export default function Login() {
           <Link to="/forgot-password">Forgot password?</Link>
         </div>
       </form>
-    </div>
+    </AuthLayout>
   );
 }

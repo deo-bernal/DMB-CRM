@@ -128,14 +128,8 @@ button.danger { background: #b91c1c; }
   object-fit: cover;
   background: #161f30;
 }
-.auth-page .brand {
-  align-items: flex-start;
-  gap: 0.9rem;
-}
-.auth-page .brand img {
-  width: 88px;
-  height: 88px;
-  border-radius: 20px;
+.auth-hero .brand {
+  align-items: center;
 }
 .brand-name {
   font-weight: 700;
@@ -182,9 +176,27 @@ button.danger { background: #b91c1c; }
 
 .auth-page {
   flex: 1;
-  display: grid;
-  place-items: center;
-  padding: 2rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 1rem 2.4rem;
+}
+.auth-hero {
+  width: 100vw;
+  margin: 0 -1rem 1.4rem;
+  background: #0f172a;
+  color: #fff;
+  padding: 1.15rem 1.4rem 1.25rem;
+  display: flex;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.18);
+}
+.auth-hero .brand-name { color: #fff; }
+.auth-hero .brand-sub { color: #cbd5e1; max-width: none; opacity: 1; }
+.auth-hero .brand img {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
 }
 .card {
   width: min(440px, 100%);
@@ -283,11 +295,13 @@ button.danger { background: #b91c1c; }
 }
 .auth-links {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   flex-wrap: wrap;
-  gap: 0.65rem;
-  margin: 0.95rem 0 0;
+  gap: 0.35rem 1.15rem;
+  margin: 1.15rem 0 0;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
 }
 .auth-links a {
   color: #475569;

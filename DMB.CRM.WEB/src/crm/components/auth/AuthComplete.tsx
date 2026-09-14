@@ -2,7 +2,7 @@ import { FormEvent, useMemo, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../../../contexts/JWTAuthContext";
 import http from "../../services/http.service";
-import BrandMark from "../layout/BrandMark";
+import AuthLayout from "./AuthLayout";
 
 export default function AuthComplete() {
   const { acceptSession } = useAuth();
@@ -46,9 +46,8 @@ export default function AuthComplete() {
   };
 
   return (
-    <div className="auth-page">
+    <AuthLayout>
       <form className="card" onSubmit={step === "email" ? onSendCode : onVerify}>
-        <BrandMark />
         <h1>Finish signing up</h1>
         <p className="muted">
           {step === "email"
@@ -84,6 +83,6 @@ export default function AuthComplete() {
           <Link to="/login">Back to sign in</Link>
         </div>
       </form>
-    </div>
+    </AuthLayout>
   );
 }
