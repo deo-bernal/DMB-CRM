@@ -50,6 +50,8 @@ export default function Shell() {
           <div className="nav-label">Your profile</div>
           <NavLink to="/account">Account</NavLink>
           <a href={`${SITE}/lms`}>LMS</a>
+          <a href={`${SITE}/commerce`}>Commerce</a>
+          <a href={`${SITE}/agent`}>Agent</a>
           <a href={`${SITE}/accent-sidebar/portfolio`}>Portfolio</a>
           <a href={SITE}>Website</a>
         </div>
